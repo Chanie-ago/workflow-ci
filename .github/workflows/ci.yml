@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 jobs:
-  training_job:
+  run_training:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -18,21 +18,20 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pip install mlflow==2.19.0 dagshub pandas scikit-learn
+          pip install mlflow==2.19.0 dagshub pandas scikit-learn joblib
 
-      - name: Run MLflow Training
+      - name: Run MLflow Project
         env:
           MLFLOW_TRACKING_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
           MLFLOW_TRACKING_PASSWORD: ${{ secrets.DAGSHUB_TOKEN }}
           MLFLOW_TRACKING_URI: https://dagshub.com/Chanie-ago/liver-disease-mlflow.mlflow
         run: |
           cd MLProject
-          # Jalankan training menggunakan env lokal runner
+          # Menjalankan training dengan environment lokal runner
           mlflow run . --env-manager local
 
-      - name: Upload Artifacts to GitHub
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: liver-disease-model
-          path: |
-            MLProject/mlruns/
+          name: liver-model-artifacts
+          path: MLProject/

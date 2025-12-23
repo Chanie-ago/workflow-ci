@@ -2,9 +2,9 @@ import pandas as pd
 import mlflow
 import mlflow.sklearn
 import argparse
+import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
 
 def train(n_estimators):
     # Load data
@@ -13,25 +13,20 @@ def train(n_estimators):
     y = df["Target"]
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    with mlflow.start_run(run_name="CI_Run"):
+    with mlflow.start_run(run_name="CI_Retraining_Run"):
         rf = RandomForestClassifier(n_estimators=n_estimators, random_state=42)
         rf.fit(X_train, y_train)
         
-        y_pred = rf.predict(X_test)
-        acc = accuracy_score(y_test, y_pred)
+        acc = rf.score(X_test, y_test)
         
-        # Log parameter & metric
+        # Log parameter & metric ke MLflow/DagsHub
         mlflow.log_param("n_estimators", n_estimators)
         mlflow.log_metric("accuracy", acc)
+        mlflow.sklearn.log_model(rf, "model")
         
-        # Log model
-        mlflow.sklearn.log_model(rf, "model_liver")
+        joblib.dump(rf, "model_liver.pkl")
         
-        with open("metrics.txt", "w") as f:
-            f.write(f"Accuracy: {acc}")
-        mlflow.log_artifact("metrics.txt")
-        
-        print(f"Training selesai. Akurasi: {acc}")
+        print(f"Training Selesai. Accuracy: {acc}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

@@ -10,3 +10,4 @@ dependencies:
       - dagshub
       - pandas
       - scikit-learn
+      - joblib
