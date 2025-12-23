@@ -36,4 +36,3 @@ jobs:
           name: liver-disease-model
           path: |
             MLProject/mlruns/
-            # Menyimpan folder mlruns agar model bisa di-download lewat GitHub
